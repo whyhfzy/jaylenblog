@@ -9,7 +9,23 @@ const notion = new Client({
 const n2m = new NotionToMarkdown({ notionClient: notion });
 const DATABASE_ID = process.env.NOTION_DATABASE_ID;
 
+// 安全读取工具函数
+function getText(prop) {
+  if (!prop) return "";
+  if (prop.title && prop.title.length > 0) {
+    return prop.title[0].plain_text;
+  }
+  if (prop.rich_text && prop.rich_text.length > 0) {
+    return prop.rich_text[0].plain_text;
+  }
+  return "";
+}
+
 async function fetchPosts() {
+  if (!DATABASE_ID) {
+    throw new Error("NOTION_DATABASE_ID is missing");
+  }
+
   const res = await notion.databases.query({
     database_id: DATABASE_ID,
     filter: {
@@ -25,12 +41,15 @@ async function fetchPosts() {
   }
 
   for (const page of res.results) {
-    const title = page.properties.Title.title[0]?.plain_text || "";
-    const slug = page.properties.Slug.rich_text[0]?.plain_text;
-    const description =
-      page.properties.Description?.rich_text[0]?.plain_text || "";
+    const title = getText(page.properties.Title);
+    const slug = getText(page.properties.Slug);
+    const description = getText(page.properties.Description);
 
-    if (!slug) continue;
+    // slug 是硬条件，没有就直接跳过
+    if (!slug) {
+      console.warn(`Skipped a page without slug: ${page.id}`);
+      continue;
+    }
 
     const mdBlocks = await n2m.pageToMarkdown(page.id);
     const mdString = n2m.toMarkdownString(mdBlocks);
@@ -42,11 +61,4 @@ slug: "${slug}"
 layout: layout.njk
 ---
 
-${mdString}
-`;
-
-    fs.writeFileSync(`src/posts/${slug}.md`, content);
-  }
-}
-
-fetchPosts();
+$
