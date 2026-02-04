@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+
+  <title>
+    {% if title %}
+      {{ title }}
+    {% else %}
+      我的博客
+    {% endif %}
+  </title>
+
+  {% if description %}
+  <meta name="description" content="{{ description }}">
+  {% endif %}
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+
+  <main>
+    {{ content | safe }}
+  </main>
+
+</body>
+</html>

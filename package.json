@@ -1,0 +1,19 @@
+{
+  "name": "notion-11ty-blog",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "build": "node notion-fetch.js && npx eleventy"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@11ty/eleventy": "^3.1.2"
+  },
+  "dependencies": {
+    "@notionhq/client": "^5.9.0",
+    "notion-to-md": "^3.1.9"
+  }
+}
